@@ -1,0 +1,46 @@
+package videoredirectsvr_protos;
+
+enum CMD
+{
+	CMD_VIDEOREDIRECT_SVR = 0x7100;
+}
+
+enum SUBCMD
+{
+	SUBCMD_VIDEOREDIRECT_GETVIDEOSVR = 0x01;
+	SUBCMD_VIDEOREDIRECT_VIDEOSVRLOAD = 0x02;
+}
+
+enum RESULT_CODE
+{
+	RESULT_VIDEOREDIRECT_SUCCESS	= 0;
+	RESULT_VIDEOREDIRECT_FAIL		= 1;
+}
+
+message VideoSvrReq
+{
+        optional bytes uuid = 1;    //默认空字符
+}
+
+message VideoSvrRsp
+{
+	required uint32 result	= 1;	//参考RESULT_CODE
+	optional uint32 ip		= 2;
+	optional uint32 port 	= 3;
+	optional bytes errormsg	= 4;	//错误信息
+	optional uint32 iptoredirect = 5 [default = 0];
+}
+
+message VideoSvrLoadReq
+{
+	optional uint32 iip			= 1;	//内网ip
+	optional uint32 eip      	= 2;	//外网ip
+	optional uint32 channelnum	= 3;	//频道数
+	optional uint32 maxchannelnum = 4;	//最大频道数
+}
+
+message VideoSvrLoadRsp
+{
+	required uint32 result 		= 1;	//参考RESULT_CODE
+	optional bytes errormsg		= 2;	//错误信息
+}

@@ -1,0 +1,6 @@
+framework module StageFaceInter {
+  umbrella header "StageFaceInter.h"
+
+  export *
+  module * { export * }
+}

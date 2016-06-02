@@ -1,0 +1,97 @@
+//CS 通信协议格式如下，uiPkgLen + 0xa + usCmd + ucSubCmd + PB + 0x3，其中uiPkgLen、usCmd均为网络序
+package videosvr_protos;
+
+enum CMD
+{
+	CMD_VIDEO_SVR = 0x7000;
+}
+
+enum SUBCMD
+{
+	SUBCMD_VIDEOSVR_LOGIN				= 0x01;	//登录验证
+	SUBCMD_VIDEOSVR_HEARBEAT			= 0x02;	//心跳
+	SUBCMD_VIDEOSVR_HEAD				= 0x03;	//视频头
+	SUBCMD_VIDEOSVR_DATA				= 0x04;	//视频数据
+	
+	SUBCMD_VIDEOSVR_ONLY_AUDIO_START	= 0x05;
+	SUBCMD_VIDEOSVR_ONLY_AUDIO_HEAD		= 0x06;
+	SUBCMD_VIDEOSVR_ONLY_AUDIO_DATA		= 0x07;
+}
+
+enum FLV_FRAMT_TYPE
+{
+	FLV_KEY_VIDEO_FRAME	 		= 1;		//关键帧
+	FLV_NORMAL_VIDEO_FRAME 		= 2;		//普通视频帧
+	FLV_NORMAL_AUDIO_FRAME		= 3;		//普通音频帧
+}
+
+enum RESULT_CODE
+{
+	VIDEOSVR_RESULT_SUCCESS 		= 0;
+	VIDEOSVR_RESULT_FAIL 			= 1;	//异常原因，导致失败
+}
+
+message VideoLogInReq
+{
+	required bytes uuid      		= 1;	//用户uuid,抽象用户
+	required bytes roomid			= 2;	//房间roomid，抽象用户所属的房间
+	optional bytes username			= 3;
+	optional bytes appname			= 4;	//业务名字
+	optional bytes token			= 5;	//登录验证
+	optional bytes machineid		= 6;	
+	optional uint32 iptoredirect = 7 [default = 0];  //访问redirect的ip
+}
+
+message VideoLogInRsp
+{
+	required uint32 result 			= 1;	//参考RESULT_CODE
+	optional bytes errormsg			= 2;	//错误信息
+}
+
+message VideoHeartbeatReq
+{
+	optional bytes unuse      		= 1;	
+}
+
+message VideoHead
+{
+	required bytes data				= 1;	//视频头
+	optional uint32 configVideoBitRate    = 2 [default = 0];    //视频码率
+	optional uint32 configAudioBitRate    = 3 [default = 0];    //音频码率 
+}
+
+message VideoData
+{	
+	required bytes  data 			= 1;	//视频数据
+    optional uint32 seq 			= 2;	//视频帧序号，从0依次递增
+	optional uint32 type			= 3;	//FLV_FRAMT_TYPE
+	optional uint32 time			= 4;	//帧时间戳
+}
+
+message MediaOnlyAudioStartReq
+{
+	required bytes  strUid      = 1;		//用户uid,抽象用户
+	required bytes  strRoomId	= 2;		//房间roomid，抽象用户所属的房间
+	optional bytes  strUuId		= 3;		//uuid
+}
+
+message MediaOnlyAudioStartRsp
+{
+	required uint32 result 		= 1;		//参考RESULT_CODE
+	optional bytes error_msg	= 2;		//错误信息
+	repeated uint32 mediasvr_ip	= 3;		//重定向后的视频采集服务IP
+}
+
+message MediaOnlyAudioHead
+{
+	required bytes strMediaHead		= 1;
+	optional uint32 configAudioBitRate    = 2 [default = 0];    //音频码率 
+}
+
+message MediaOnlyAudioData
+{
+    required uint32 uiFrameSeq 		= 1;	//视频帧序号，从0依次递增
+	required uint32 uiKeyFrame		= 2;	//0非关键帧，1关键帧
+    required bytes  strChunkData 	= 3;	//视频数据
+}
+
